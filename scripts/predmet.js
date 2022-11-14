@@ -18,3 +18,5 @@ class Predmet {
     }
 
 }
+
+module.exports = Predmet;

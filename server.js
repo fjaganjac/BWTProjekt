@@ -1,5 +1,6 @@
 const fs = require('fs');
 const http = require('http');
+const Predmet = require('./scripts/predmet');
 
 const server = http.createServer(function (req, res) {
     if (req.url == '/student' && req.method.toUpperCase() == 'POST') {
@@ -28,5 +29,40 @@ const server = http.createServer(function (req, res) {
             });
         });
     }
+
+    else if (req.url == '/predmet' && req.method.toUpperCase() == 'POST') {
+        let buffer = '';
+        req.on('data', function (data) {
+            buffer += data;
+        });
+        req.on('end', function () {
+            const payload = JSON.parse(buffer);
+
+            fs.readFile('./archives/predmeti.csv', function (err, data) {
+                if (err) throw err;
+
+                if (data.includes(`,${payload.kod}`)) {
+                    res.writeHead(201, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ status: `Predmet sa kodom ${payload.kod} vec postoji` }));
+                }
+                else {
+                    var predmet = new Predmet();
+                    if (!predmet.provjeriKodPredmeta(payload.kod)) {
+                        res.writeHead(201, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ status: `Kod predmeta nije ispravan` }));
+                    }
+                    else {
+                        let novaLinija = `${payload.naziv},${payload.kod}\n`;
+                        fs.appendFile('./archives/predmeti.csv', novaLinija, function (err) {
+                            if (err) throw err;
+                            res.writeHead(201, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ status: "Kreiran predmet!" }));
+                        });
+                    }
+                }
+            });
+        });
+    }
+
 }).listen(8080);
 console.log("slusam port 8080");

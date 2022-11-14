@@ -1,5 +1,6 @@
 const fs = require('fs');
 const http = require('http');
+const url = require('url');
 const Predmet = require('./scripts/predmet');
 
 const server = http.createServer(function (req, res) {
@@ -64,7 +65,7 @@ const server = http.createServer(function (req, res) {
         });
     }
 
-    else if (req.url == '/prisustvo' && req.method.toUpperCase() == 'POST') {  //prisustvo = {tipCasa:string,redniBrojCasa:integer,sedmica:integer,kodPredmeta:string,indexStudenta:string,statusPrisustva:string}
+    else if (req.url == '/prisustvo' && req.method.toUpperCase() == 'POST') {
         let buffer = '';
         req.on('data', function (data) {
             buffer += data;
@@ -124,6 +125,36 @@ const server = http.createServer(function (req, res) {
                     })
                 }
             }
+        });
+    }
+
+    else if (req.url.includes('/prisustvo') && req.method.toUpperCase() == 'GET') {
+        let buffer = '';
+        req.on('data', function (data) {
+            buffer += data;
+        });
+        req.on('end', function () {
+            const params = url.parse(req.url, true).query
+            var rprisutan = rodsutan = rnijeUneseno = 0;
+            fs.readFile('./archives/prisustva.csv', function (err, data) {
+                if (err) throw err;
+                for (var red of data.toString().split('\n')) {
+                    var podaciURedu = red.split(',')
+                    if (podaciURedu[2] == params.sedmica && podaciURedu[3] == params.kodPredmeta && podaciURedu[4] == params.indexStudenta) {
+                        if (podaciURedu[5].toString().includes("prisutan")) rprisutan++
+                        if (podaciURedu[5].toString().includes("odsutan")) rodsutan++
+                        if (podaciURedu[5].includes("nijeUneseno")) rnijeUneseno++
+                    }
+                }
+                if (!rprisutan && !rodsutan && !rnijeUneseno) {
+                    res.writeHead(201, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ status: "Prisustvo ne postoji!" }));
+                }
+                else {
+                    res.writeHead(201, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ prisustvoZaSedmicu: params.sedmica, prisutan: rprisutan, odsutan: rodsutan, nijeUneseno: rnijeUneseno }));
+                }
+            })
         });
     }
 }).listen(8080);

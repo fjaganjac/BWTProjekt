@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="prisustvoHandler.js" type="module"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" >
+  <link rel="stylesheet" href="prisustvo.css">
+  <title>Prisustvo</title>
+</head>
+
+<body>
+  <form>
+    <h1>Prisustvo</h1>
+    <div class="formcontainer">
+      <div class="container">
+        <label><strong>Kod predmeta</strong></label>
+        <input type="text" id="kodPredmeta" placeholder="Kod predmeta" required>
+        <label><strong>Index studenta</strong></label>
+        <input type="text" id="indexStudenta" placeholder="Index studenta" required>
+        <label><strong>Sedmica</strong></label>
+        <input type="text" id="sedmica" placeholder="sedmica" required>
+      </div>
+      <button type="button" id="prikazi">PRIKAŽI PRISUSTVO</button>
+      <p id="poruka"></p>
+  </form>
+  <table id="tabela" hidden>
+    <tr>
+      <td>prisustvoZaSedmicu</td>
+      <td>
+        <p id="prisustvoZaSedmicu"></p>
+      </td>
+    </tr>
+    <tr>
+      <td>prisutan</td>
+      <td>
+        <p id="prisutan"></p>
+      </td>
+    </tr>
+    <tr>
+      <td>odsutan</td>
+      <td>
+        <p id="odsutan"></p>
+      </td>
+    </tr>
+    <tr>
+      <td>nijeUneseno</td>
+      <td>
+        <p id="nijeUneseno"></p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
